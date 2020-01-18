@@ -32,7 +32,7 @@ router.get('/:id', (req, res) => {
         });
 });
 
-router.post('/', (req, res) => {
+router.post('/', validateBody(['name', 'budget']), (req, res) => {
     const payload = {
         name: req.body.name,
         budget: req.body.budget
@@ -55,7 +55,7 @@ router.post('/', (req, res) => {
         });
 });
 
-router.put('/:id', validateId, (req, res) => {
+router.put('/:id', validateId, validateBody(['name', 'budget']), (req, res) => {
     const payload = {
         name: req.body.name,
         budget: req.body.budget
@@ -97,6 +97,18 @@ function validateId(req, res, next) {
             console.log(err);
             res.status(500).json({error: err, message: `Unable to retrieve account of id ${id}`});
         });
-};   
+}; 
+
+function validateBody(fields) {
+    return function(req, res, next) {
+        for (let i=0; i<fields.length; i++) {
+            let field = fields[i];
+            if (!req.body[field]) {
+                res.status(400).json({message: `Account is missing ${field}`})
+            }
+        }
+        next();
+    };
+};
 
 module.exports = router;
