@@ -63,7 +63,6 @@ router.put('/:id', validateId, validateBody(['name', 'budget']), (req, res) => {
     db('accounts').where({id: req.params.id}).update(payload)
         .then(response => {
             console.log(response);
-            //res.status(201).json(response);
             if (response !== 1) {
                 res.status(500).json({message: `Unable to update account of id ${req.params.id}`});
             } else {
@@ -80,6 +79,29 @@ router.put('/:id', validateId, validateBody(['name', 'budget']), (req, res) => {
         .catch(err => {
             console.log(err);
             res.status(500).json({error: err, message: `Unable to update account of id ${req.params.id}`});
+        });
+});
+
+router.delete('/:id', validateId, (req, res) => {
+    const id = req.params.id;
+    db('accounts').where({id : id}).del()
+        .then(response => {
+            console.log(response);
+            if (response === 1) {
+                db('accounts')
+                .then(response => {
+                    console.log(response);
+                    res.status(200).json(response);
+                })
+                .catch(err => {
+                    console.log(err);
+                    res.status(500).json({error: err, message: "There was an error while retrieving the accounts"});
+                });
+            }
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(500).json({error: err, message: `There was an error while deleting the account of id {id}`});
         });
 });
 
