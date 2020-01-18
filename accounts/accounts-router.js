@@ -32,4 +32,27 @@ router.get('/:id', (req, res) => {
         });
 });
 
+router.post('/', (req, res) => {
+    const payload = {
+        name: req.body.name,
+        budget: req.body.budget
+    };
+    db('accounts').insert(payload)
+        .then(response => {
+            console.log(response);
+            db('accounts').where({id :response[0]}).first()
+                .then(newResponse => {
+                    res.status(201).json(newResponse);
+                })
+                .catch(err => {
+                    console.log(err);
+                    res.status(500).json({error: err, message: `There was an error while retrieving the new account, which has the id of ${id}`});
+                });  
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(500).json({error: err, message: "Unable to insert new account."});
+        });
+});
+
 module.exports = router;
